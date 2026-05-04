@@ -1,35 +1,9 @@
 {
-  "name": "CypherX",
-  "description": "CypherX, your friendly assistant!",
-  "repository": "https://github.com/Dark-Xploit/CypherX",
-  "stack": "container",
-
-  "formation": {
-    "web": {
-      "quantity": 1,
-      "size": "standard-1x"
-    }
-  },
-
-  "addons": [
-    { "plan": "heroku-postgresql" }
-  ],
-
-  "scripts": {
-    "start": "node index.js"
-  },
-
-  "env": {
-    "SESSION_ID": {
-      "description": "Must begin with 'XPLOADER-BOT:~' or 'CYPHER-X:~'.",
-      "required": false
-    }
-  },
-
-  "buildpacks": [
-    { "url": "heroku/nodejs" },
-    { "url": "https://github.com/DuckyTeam/heroku-buildpack-imagemagick.git" },
-    { "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest" },
-    { "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git" }
-  ]
+  "name": "kandala-tech-pair",
+  "description": "𝗞𝗔𝗡𝗗𝗔𝗟𝗔 𝗧𝗘𝗖𝗛® WhatsApp Pair Code Generator",
+  "website": "https://github.com/kandala20/KANDALA-TECH-PAIR",
+  "repository": "https://github.com/kandala20/KANDALA-TECH-PAIR",
+  "logo": "https://i.imgur.com/LdZ4J6y.png",
+  "success_url": "/",
+  "keywords": ["whatsapp", "pair", "bot", "kandala", "tech"]
 }
