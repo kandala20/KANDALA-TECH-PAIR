@@ -46,24 +46,19 @@ async function startBot() {
 │ *DOWNLOADER*
 │ •.play - Download song
 │ •.video - Download video
-│ •.tiktok - TikTok
 │
 │ *AI & CHAT*
 │ •.ai - ChatGPT
-│ •.img - Generate image
 │
 │ *GROUP*
 │ •.kick - Toa mtu
 │ •.tagall - Tag wote
-│
-│ *CONVERTER*
-│ •.sticker - Picha to sticker
 │
 │ *Owner: 255672752355*
 ╰───────────────`
             await sock.sendMessage(from, { text: menuText })
         }
     })
-} // <-- HII BRACE ULIKUWA UMESAHAU
+}
 
-startBot() // <-- NA HII ULIKUWA UMESAHAU
+startBot()
