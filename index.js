@@ -1,56 +1,69 @@
-const express = require('express')
-const { default: makeWASocket, useMultiFileAuthState, Browsers } = require('@whiskeysockets/baileys')
+const { default: makeWASocket, useMultiFileAuthState, Browsers, DisconnectReason } = require('baileys')
 const pino = require('pino')
-const app = express()
-const port = process.env.PORT || 3000
+const qrcode = require('qrcode-terminal')
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+async function startBot() {
+    const { state, saveCreds } = await useMultiFileAuthState('session')
 
-app.get('/', (req, res) => {
-  res.send(`
-    <html>
-      <head><title>𝗞𝗔𝗡𝗗𝗔𝗟𝗔 𝗧𝗘𝗖𝗛® Pair</title></head>
-      <body style="background:#0d1117;color:#fff;font-family:sans-serif;text-align:center;padding-top:50px">
-        <h1>𝗞𝗔𝗡𝗗𝗔𝗟𝗔 𝗧𝗘𝗖𝗛® Pair Code</h1>
-        <form action="/pair" method="post">
-          <input name="number" placeholder="255712345678" style="padding:10px;width:250px" required>
-          <button style="padding:10px;background:#00ff88;border:none;cursor:pointer">Get Code</button>
-        </form>
-      </body>
-    </html>
-  `)
-})
+    const sock = makeWASocket({
+        auth: state,
+        logger: pino({ level: 'silent' }),
+        browser: Browsers.ubuntu('Chrome'),
+        printQRInTerminal: true
+    })
 
-app.post('/pair', async (req, res) => {
-  let num = req.body.number.replace(/[^0-9]/g, '')
-  if (!num) return res.send('Weka namba sahihi')
-  
-  const { state, saveCreds } = await useMultiFileAuthState('./session')
-  const sock = makeWASocket({
-    auth: state,
-    printQRInTerminal: false,
-    logger: pino({ level: 'silent' }),
-    browser: Browsers.macOS('Desktop')
-  })
-  
-  sock.ev.on('creds.update', saveCreds)
-  
-  if (!sock.authState.creds.registered) {
-    try {
-      await delay(1500)
-      let code = await sock.requestPairingCode(num)
-      res.send(`<body style="background:#0d1117;color:#fff;text-align:center;padding-top:50px;font-family:sans-serif"><h1 style="color:#00ff88">Your Pair Code: ${code}</h1><p>Fungua WhatsApp > Linked Devices > Link with phone number</p><a href="/" style="color:#00ff88">Back</a></body>`)
-    } catch (e) {
-      res.send(`<body style="background:#0d1117;color:#fff;text-align:center;padding-top:50px"><h2 style="color:red">Error: ${e.message}</h2><a href="/" style="color:#00ff88">Try Again</a></body>`)
-    }
-  } else {
-    res.send('<body style="background:#0d1117;color:#fff;text-align:center;padding-top:50px"><h2>Already paired</h2><a href="/" style="color:#00ff88">Back</a></body>')
-  }
-})
+    sock.ev.on('creds.update', saveCreds)
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+    sock.ev.on('connection.update', ({ connection, lastDisconnect, qr }) => {
+        if (qr) {
+            console.log('==== SCAN HII QR MKUU - UNA 60 SECONDS ====')
+            qrcode.generate(qr, { small: true })
+        }
 
-app.listen(port, () => console.log(`𝗞𝗔𝗡𝗗𝗔𝗟𝗔 𝗧𝗘𝗖𝗛® running on ${port}`))
+        if (connection === 'close') {
+            const shouldReconnect = lastDisconnect?.error?.output?.statusCode!== DisconnectReason.loggedOut
+            console.log('Connection closed, reconnecting:', shouldReconnect)
+            if (shouldReconnect) startBot()
+        }
+
+        if (connection === 'open') {
+            console.log('✅ KANDALA-BOT IMEUNGWA WHATSAPP')
+        }
+    })
+
+    sock.ev.on('messages.upsert', async ({ messages }) => {
+        const m = messages[0]
+        if (!m.message || m.key.fromMe) return
+
+        const from = m.key.remoteJid
+        const body = m.message.conversation || m.message.extendedTextMessage?.text || ''
+
+        if (body.toLowerCase() === 'menu' || body === '.menu') {
+            const menuText = `╭───❰ *KANDALA TECH* ❱───
+│
+│ 🔥 *200+ FEATURES*
+│
+│ *DOWNLOADER*
+│ •.play - Download song
+│ •.video - Download video
+│ •.tiktok - TikTok
+│
+│ *AI & CHAT*
+│ •.ai - ChatGPT
+│ •.img - Generate image
+│
+│ *GROUP*
+│ •.kick - Toa mtu
+│ •.tagall - Tag wote
+│
+│ *CONVERTER*
+│ •.sticker - Picha to sticker
+│
+│ *Owner: 255672752355*
+╰───────────────`
+            await sock.sendMessage(from, { text: menuText })
+        }
+    })
+} // <-- HII BRACE ULIKUWA UMESAHAU
+
+startBot() // <-- NA HII ULIKUWA UMESAHAU
