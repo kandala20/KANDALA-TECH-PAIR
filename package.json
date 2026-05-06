@@ -1,20 +1,13 @@
 {
-  "name": "kandala-tech-pair",
-  "version": "3.0.0",
-  "description": "𝗞𝗔𝗡𝗗𝗔𝗟𝗔 𝗧𝗘𝗖𝗛® WhatsApp Pair Code Generator",
+  "name": "kandala-tech-bot",
+  "version": "1.0.0",
   "main": "index.js",
-  "engines": {
-    "node": ">= 18.x"
-  },
   "scripts": {
     "start": "node index.js"
   },
-  "author": "𝗞𝗔𝗡𝗗𝗔𝗟𝗔 𝗧𝗘𝗖𝗛®",
-  "license": "ISC",
   "dependencies": {
-    "@whiskeysockets/baileys": "latest",
-    "express": "^4.19.2",
-    "qrcode": "^1.5.3",
-    "pino": "^8.14.1"
+    "baileys": "^6.7.17",
+    "qrcode-terminal": "^0.12.0",
+    "pino": "^8.19.0"
   }
 }
